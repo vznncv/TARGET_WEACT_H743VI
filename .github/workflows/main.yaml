@@ -1,0 +1,44 @@
+on:
+  push:
+    tags: "v[0-9]+.[0-9]+.[0-9]+**"
+    branches: "*"
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  mbed-cli-1-example-compilation-test:
+    strategy:
+      matrix:
+        include:
+          - mbed_os_version: "mbed-os-6.12.0"
+    runs-on: ubuntu-latest
+    container: mbedos/mbed-os-env
+    steps:
+      - name: Prepare environment
+        run: |
+          echo "MBED_OS_REPO=https://github.com/ARMmbed/mbed-os.git#${{ matrix.mbed_os_version }}" >> "$GITHUB_ENV"
+          echo "CUSTOM_TARGET_REPO=${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}.git#${GITHUB_SHA}" >> "$GITHUB_ENV"
+          echo "CUSTOM_TARGET_NAME=${GITHUB_REPOSITORY##*/TARGET_}" >> "$GITHUB_ENV"
+          echo "CUSTOM_TARGET_DIR=${GITHUB_REPOSITORY##*/}" >> "$GITHUB_ENV"
+          echo "CUSTOM_TARGET_EXAMPLES_DIR=${GITHUB_REPOSITORY##*/}/examples" >> "$GITHUB_ENV"
+          git config --global "http.${GITHUB_SERVER_URL}/.extraheader" "AUTHORIZATION: basic $( echo -n "x-access-token:${{ secrets.GITHUB_TOKEN }}" | base64 )"
+      - name: Create and configure demo project
+        run: |
+          mbed-cli new --create-only .
+          mbed-cli add "$MBED_OS_REPO"
+          mbed-cli add "$CUSTOM_TARGET_REPO"
+          cp "${CUSTOM_TARGET_DIR}/custom_targets.json" ./
+          mbed conf TARGET "$CUSTOM_TARGET_NAME"
+          mbed conf TOOLCHAIN GCC_ARM
+          echo -e "BUILD\n" > .mbedignore
+          touch main.cpp
+      - name: Compile examples
+        run: |
+          for CUSTOM_TARGET_EXAMPLE_PATH in $CUSTOM_TARGET_EXAMPLES_DIR/*.cpp; do
+              echo "================================================================================" >&2
+              echo "Compile example $CUSTOM_TARGET_EXAMPLE_PATH" >&2
+              cp "$CUSTOM_TARGET_EXAMPLE_PATH" main.cpp >&2
+              mbed compile --profile debug
+              echo "Complete compilcation succefully" >&2
+          done
