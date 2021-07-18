@@ -1,0 +1,28 @@
+{
+    "WEACT_H743VI": {
+        "inherits": [
+            "MCU_STM32H743xI"
+        ],
+        "config": {
+            "hse_value": {
+                "help": "Explicit HSE value (25MHz)",
+                "value": "25000000",
+                "macro_name": "HSE_VALUE"
+            }
+        },
+        "overrides": {
+            "clock_source": "USE_PLL_HSE_XTAL | USE_PLL_HSI",
+            "system_power_supply": "PWR_LDO_SUPPLY",
+            "lse_available": 1,
+            "rtc_clock_source": "USE_RTC_CLK_LSE_OR_LSI"
+        },
+        "device_has_add": [
+            "USBDEVICE",
+            "EMAC"
+        ],
+        "detect_code": [
+            "1234"
+        ],
+        "device_name": "STM32H743VIT6"
+    }
+}
