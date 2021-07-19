@@ -8,5 +8,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Add WeAct STM32H743VIT6 custom target support for Mbed OS 6.12
+- Add WeAct STM32H743VIT6 custom target support for Mbed OS 6.13
 - Add base examples

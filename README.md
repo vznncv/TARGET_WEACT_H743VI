@@ -56,7 +56,7 @@ provides Mbed OS 6 support for this board.
 
 | Mbed OS | status |
 |---|---|
-| 6.12 | Compiles and runs ok |
+| 6.13 | Compiles and runs ok |
 
 ## Project configuration
 
